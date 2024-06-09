@@ -1,5 +1,8 @@
 package SWEN656.tictactoe.agtictactoe;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class Referee {
 	public boolean isGameOver(Board board) {
         return board.isBoardFull() || hasWinner(board, 'X') || hasWinner(board, 'O');

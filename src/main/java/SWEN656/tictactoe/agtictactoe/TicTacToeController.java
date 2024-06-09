@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/tictactoe")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class TicTacToeController {
 
     @Autowired
@@ -18,6 +19,7 @@ public class TicTacToeController {
 
     @Autowired
     private Referee referee;
+    
 
     @PostMapping("/start")
     public String startGame() {

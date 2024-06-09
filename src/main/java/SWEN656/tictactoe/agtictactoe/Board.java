@@ -1,5 +1,8 @@
 package SWEN656.tictactoe.agtictactoe;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class Board {
 	protected char[][] grid = new char[3][3];
 
