@@ -1,34 +1,39 @@
 package SWEN656.tictactoe.agtictactoe;
 
 public class Referee {
-    private Board board;
-
-    public Referee(Board board) {
-        this.board = board;
+	public boolean isGameOver(Board board) {
+        return board.isBoardFull() || hasWinner(board, 'X') || hasWinner(board, 'O');
     }
 
-    public boolean isGameOver() {
-        return hasWinner('X') || board.isBoardFull();
+    public boolean hasWinner(Board board, char mark) {
+        // Check rows, columns, and diagonals for a win
+        for (int i = 0; i < 3; i++) {
+            if ((board.grid[i][0] == mark && board.grid[i][1] == mark && board.grid[i][2] == mark) || 
+                (board.grid[0][i] == mark && board.grid[1][i] == mark && board.grid[2][i] == mark)) {
+                return true;
+            }
+        }
+        if ((board.grid[0][0] == mark && board.grid[1][1] == mark && board.grid[2][2] == mark) || 
+            (board.grid[0][2] == mark && board.grid[1][1] == mark && board.grid[2][0] == mark)) {
+            return true;
+        }
+        return false;
     }
 
-    public boolean hasWinner(char mark) {
-        return (board.grid[0][0] == mark && board.grid[0][1] == mark && board.grid[0][2] == mark) ||
-               (board.grid[1][0] == mark && board.grid[1][1] == mark && board.grid[1][2] == mark) ||
-               (board.grid[2][0] == mark && board.grid[2][1] == mark && board.grid[2][2] == mark) ||
-               (board.grid[0][0] == mark && board.grid[1][0] == mark && board.grid[2][0] == mark) ||
-               (board.grid[0][1] == mark && board.grid[1][1] == mark && board.grid[2][1] == mark) ||
-               (board.grid[0][2] == mark && board.grid[1][2] == mark && board.grid[2][2] == mark) ||
-               (board.grid[0][0] == mark && board.grid[1][1] == mark && board.grid[2][2] == mark) ||
-               (board.grid[0][2] == mark && board.grid[1][1] == mark && board.grid[2][0] == mark);
+    public Player getWinner(Board board, Player player1, Player player2) {
+        if (hasWinner(board, player1.getMark())) {
+            return player1;
+        } else if (hasWinner(board, player2.getMark())) {
+            return player2;
+        }
+        return null;
     }
 
-    public void announceWinner(Player player1, Player player2) {
-        if (hasWinner('X')) {
-            System.out.println(player1.getName() + " wins!");
-        } else if (hasWinner('O')) {
-            System.out.println(player2.getName() + " wins!");
+    public void announceWinner(Player winner) {
+        if (winner != null) {
+            System.out.println("Game Over: Player " + winner.getName() + " wins!");
         } else {
-            System.out.println("It's a tie!");
+            System.out.println("Game Over: It's a tie!");
         }
     }
 }

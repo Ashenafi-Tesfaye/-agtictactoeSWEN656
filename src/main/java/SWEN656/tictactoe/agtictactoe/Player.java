@@ -16,4 +16,10 @@ public class Player {
     public char getMark() {
         return mark;
     }
+    
+	public void move(Board board, int row, int col) {
+		if (board.isValidMove(row, col)) {
+            board.placeMark(row, col, this.mark);
+        }
+	}
 }

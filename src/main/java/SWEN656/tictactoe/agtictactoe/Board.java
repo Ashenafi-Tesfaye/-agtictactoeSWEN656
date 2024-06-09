@@ -1,7 +1,7 @@
 package SWEN656.tictactoe.agtictactoe;
 
 public class Board {
-    protected char[][] grid = new char[3][3];
+	protected char[][] grid = new char[3][3];
 
     public void initialize() {
         for (int i = 0; i < 3; i++) {
@@ -24,22 +24,18 @@ public class Board {
     }
 
     public boolean isBoardFull() {
-        boolean isFull = true;
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                if (grid[i][j] == ' ') {
-                    isFull = false;
+                if (grid[i][j] == '-') {
+                    return false;
                 }
             }
         }
-        return isFull;
+        return true;
     }
 
     public boolean isValidMove(int row, int col) {
-        if (row >= 0 && row < 3 && col >= 0 && col < 3 && grid[row][col] == '-') {
-            return true;
-        }
-        return false;
+        return (row >= 0 && row < 3 && col >= 0 && col < 3 && grid[row][col] == '-');
     }
 
     public void placeMark(int row, int col, char mark) {
