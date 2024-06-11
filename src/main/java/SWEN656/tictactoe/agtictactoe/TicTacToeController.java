@@ -1,62 +1,57 @@
 package SWEN656.tictactoe.agtictactoe;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/tictactoe")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class TicTacToeController {
+    private final GameSessionManager gameSessionManager;
 
     @Autowired
-    private Board board;
+    public TicTacToeController(GameSessionManager gameSessionManager) {
+        this.gameSessionManager = gameSessionManager;
+    }
 
-    @Autowired
-    private Player player1;
+    @GetMapping("/start")
+    public ResponseEntity<Map<String, String>> startGame() {
+        String gameId = gameSessionManager.createGame();
+        String playerMark = "X"; // Assuming player 1 is always X
 
-    @Autowired
-    private Player player2;
+        Map<String, String> response = new HashMap<>();
+        response.put("gameId", gameId);
+        response.put("playerMark", playerMark);
+        response.put("joinUrl", "http://localhost:8080/index.html?gameId=" + gameId + "&playerMark=" + playerMark);
 
-    @Autowired
-    private Referee referee;
-    
-
-    @PostMapping("/start")
-    public String startGame() {
-        board.initialize();
-        return "Game started!";
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/move")
-    public String makeMove(@RequestParam int player, @RequestParam int row, @RequestParam int col) {
-        Player currentPlayer = (player == 1) ? player1 : player2;
-        if (board.isValidMove(row, col)) {
-            currentPlayer.move(board, row, col);
-            if (referee.isGameOver(board)) {
-                Player winner = referee.getWinner(board, player1, player2);
+    public String makeMove(@RequestParam String gameId, @RequestParam String playerMark, @RequestParam int row, @RequestParam int col) {
+        TicTacToeGame game = gameSessionManager.getGame(gameId);
+        if (game == null) {
+            return "Game not found!";
+        }
+
+        Player currentPlayer = game.getCurrentPlayer();
+        if (playerMark.equals(String.valueOf(currentPlayer.getMark()))) {
+            boolean gameOver = game.makeMove(row, col);
+            if (gameOver) {
+                Player winner = game.getWinner();
                 if (winner != null) {
                     return "Player " + winner.getName() + " wins!";
-                } else if (board.isBoardFull()) {
+                } else {
                     return "It's a tie!";
                 }
             }
             return "Move accepted!";
         } else {
-            return "Invalid move!";
+            return "It's not your turn!";
         }
-    }
-
-    @GetMapping("/board")
-    public String displayBoard() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 3; i++) {
-            sb.append("-------------\n| ");
-            for (int j = 0; j < 3; j++) {
-                sb.append(board.grid[i][j]).append(" | ");
-            }
-            sb.append("\n");
-        }
-        sb.append("-------------");
-        return sb.toString();
     }
 }

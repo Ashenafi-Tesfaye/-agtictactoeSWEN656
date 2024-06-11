@@ -1,0 +1,112 @@
+.game-container {
+  text-align: center;
+  font-family: 'Arial', sans-serif;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.button-container {
+  margin-bottom: 20px;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin: 0 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+table {
+  border-collapse: collapse;
+  margin: 20px auto;
+}
+
+td {
+  width: 60px;
+  height: 60px;
+  text-align: center;
+  font-size: 24px;
+  border: 1px solid #000;
+  cursor: not-allowed; /* Default cursor */
+}
+
+td.clickable {
+  cursor: pointer; /* Change cursor when clickable */
+}
+
+td:hover:not(.clickable) {
+  background-color: #f8f9fa; /* Light hover effect for non-clickable cells */
+}
+
+td.clickable:hover {
+  background-color: #e9ecef; /* Different hover effect for clickable cells */
+}
+
+.welcome-message {
+  background-color: #f0f0f0;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.message {
+  display: none;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.winner-message {
+  background-color: #66bb6a; /* Light green for winner message */
+  color: #fff; /* White text color */
+}
+
+.tie-message {
+  background-color: #ef5350; /* Red for tie message */
+  color: #fff; /* White text color */
+}
+
+.cell-style {
+  background-color: #add8e6; /* Light blue background for cells */
+  color: #333; /* Dark text color for better contrast */
+  border: 1px solid #999;
+  width: 60px;
+  height: 60px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.cell-style:hover {
+  background-color: #87ceeb; /* Slightly darker blue on hover */
+}
+
+.header {
+    text-align: center;
+    background-color: #007bff;
+    color: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 24px;
+}

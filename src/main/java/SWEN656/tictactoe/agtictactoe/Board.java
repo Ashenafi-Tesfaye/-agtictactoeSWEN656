@@ -4,7 +4,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Board {
-	protected char[][] grid = new char[3][3];
+    protected char[][] grid = new char[3][3];
+    private String[][] board;
+
 
     public void initialize() {
         for (int i = 0; i < 3; i++) {
@@ -27,21 +29,33 @@ public class Board {
     }
 
     public boolean isBoardFull() {
+        boolean isFull = true;
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (grid[i][j] == '-') {
-                    return false;
+                    isFull = false;
                 }
             }
         }
-        return true;
+        return isFull;
     }
 
     public boolean isValidMove(int row, int col) {
-        return (row >= 0 && row < 3 && col >= 0 && col < 3 && grid[row][col] == '-');
+        if (row >= 0 && row < 3 && col >= 0 && col < 3 && grid[row][col] == '-') {
+            return true;
+        }
+        return false;
     }
 
     public void placeMark(int row, int col, char mark) {
         grid[row][col] = mark;
+    }
+
+    public char[][] getGrid() {
+        return grid;
+    }
+    
+    public String[][] getBoard() {
+        return this.board;
     }
 }
