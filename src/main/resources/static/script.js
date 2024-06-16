@@ -46,6 +46,10 @@ function connectWebSocket() {
             if (message.status === "success") {
             currentPlayer = message.playerMark; // Update currentPlayer from backend
             console.log(`Player mark set to ${currentPlayer}`);
+            
+            // Display player's mark on UI
+            document.getElementById('playerMark').textContent = `Your mark: ${currentPlayer}`;
+            
             const board = message.board; // Assuming backend sends the initial board state
             updateBoard(board); // Update board with the current state
             } else {
