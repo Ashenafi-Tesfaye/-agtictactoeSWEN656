@@ -9,8 +9,8 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 public class AppConfig {
 
 @Bean
-public GameOverAspect gameOverAspect() {
-    return new GameOverAspect();
+public LoggingAspect gameOverAspect() {
+    return new LoggingAspect();
 }
     
 }

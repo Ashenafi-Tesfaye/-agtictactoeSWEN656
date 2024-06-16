@@ -15,7 +15,7 @@ public class TicTacToeGame {
     private int currentPlayerIndex;
     private Referee referee;
 
-    private static final Logger logger = LoggerFactory.getLogger(GameOverAspect.class);
+    private static final Logger logger = LoggerFactory.getLogger(TicTacToeGame.class);
 
 
     public TicTacToeGame(Referee referee) {
@@ -47,7 +47,7 @@ public class TicTacToeGame {
             board[row][col] = mark;
             currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
 
-            logger.info("make move happened " + mark);
+            logger.info("Player {} made a move at [{}, {}]", mark, row, col); 
 
             return true;
         }
