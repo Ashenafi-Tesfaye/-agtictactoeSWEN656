@@ -11,7 +11,7 @@ function connectWebSocket() {
         return;
     }
 
-    socket = new WebSocket("ws://localhost:8080/tictactoe/ws");
+    socket = new WebSocket("wss://agtictactoeswen656i-c8398b41c2e9.herokuapp.com/tictactoe/ws");
 
     socket.onopen = function() {
         console.log("Connected to WebSocket server.");
@@ -87,7 +87,7 @@ function connectWebSocket() {
 }
 
 function startNewGame() {
-    fetch(`http://localhost:8080/tictactoe/start`, {
+    fetch(`https://agtictactoeswen656i-c8398b41c2e9.herokuapp.com/tictactoe/start`, {
         method: 'POST' // Specify the POST method
     })
         .then(response => {
