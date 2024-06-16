@@ -71,18 +71,18 @@ td.clickable:hover {
 }
 
 .winner-message {
-  background-color: #66bb6a; /* Light green for winner message */
-  color: #fff; /* White text color */
+  background-color: #66bb6a; 
+  color: #fff; 
 }
 
 .tie-message {
-  background-color: #ef5350; /* Red for tie message */
-  color: #fff; /* White text color */
+  background-color: #ef5350; 
+  color: #fff; 
 }
 
 .cell-style {
-  background-color: #add8e6; /* Light blue background for cells */
-  color: #333; /* Dark text color for better contrast */
+  background-color: #add8e6; 
+  color: #333; 
   border: 1px solid #999;
   width: 60px;
   height: 60px;
@@ -93,7 +93,7 @@ td.clickable:hover {
 }
 
 .cell-style:hover {
-  background-color: #87ceeb; /* Slightly darker blue on hover */
+  background-color: #87ceeb; 
 }
 
 .header {
@@ -109,4 +109,21 @@ td.clickable:hover {
 .header h1 {
     margin: 0;
     font-size: 24px;
+}
+
+button:disabled {
+  background-color: #dc3545; 
+  cursor: not-allowed; 
+}
+
+.start-game-btn {
+  background-color: #4CAF50; 
+  color: white;
+  padding: 15px 25px; 
+  font-size: 16px; 
+  font-weight: bold; 
+  text-shadow: 1px 1px 2px #000; 
+  box-shadow: 0 5px #666;
+  border-radius: 10px; 
+  transition: all 0.3s; 
 }

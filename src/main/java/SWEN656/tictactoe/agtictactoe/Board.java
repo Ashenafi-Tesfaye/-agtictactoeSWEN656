@@ -40,12 +40,6 @@ public class Board {
         return isFull;
     }
 
-    public boolean isValidMove(int row, int col) {
-        if (row >= 0 && row < 3 && col >= 0 && col < 3 && grid[row][col] == '-') {
-            return true;
-        }
-        return false;
-    }
 
     public void placeMark(int row, int col, char mark) {
         grid[row][col] = mark;

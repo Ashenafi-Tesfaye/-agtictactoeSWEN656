@@ -1,91 +1,141 @@
 package SWEN656.tictactoe.agtictactoe;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.util.HashMap;
+import java.util.Map;
+
 
 @Component
 public class TicTacToeGame {
-    private final Board board;
-    private final Player player1;
-    private final Player player2;
-    private Player currentPlayer;
-    private final Referee referee;
-    private String[][] grid; // Step 1: Grid state representation
+    private char[][] board;
+    private String gameId;
+    private Map<String, Player> players;
+    private int currentPlayerIndex;
+    private Referee referee;
+
+    private static final Logger logger = LoggerFactory.getLogger(GameOverAspect.class);
 
 
-    @Autowired
     public TicTacToeGame(Referee referee) {
         this.referee = referee;
-        this.grid = new String[3][3]; // Step 2: Initialize grid state
-        this.board = new Board();
-        this.player1 = new Player("Player 1", 'X');
-        this.player2 = new Player("Player 2", 'O');
-        this.currentPlayer = player1;
-        board.initialize();
+        board = new char[3][3];
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                board[i][j] = '-';
+            }
+        }
+        players = new HashMap<>();
+        currentPlayerIndex = 0;
     }
 
-    public Board getBoard() {
+    public void setGameId(String gameId) {
+        this.gameId = gameId;
+    }
+
+    public String getGameId() {
+        return gameId;
+    }
+
+    public char[][] getBoard() {
         return board;
     }
 
-    public Player getCurrentPlayer() {
-        return currentPlayer;
-    }
+    public synchronized boolean makeMove(int row, int col, char mark) {
+        if (row >= 0 && row < 3 && col >= 0 && col < 3 && board[row][col] == '-') {
+            board[row][col] = mark;
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
 
-   // Modify the makeMove method to include grid update
-public boolean makeMove(int row, int col) {
-    if (board.isValidMove(row, col)) {
-        board.placeMark(row, col, currentPlayer.getMark());
-        updateGrid(row, col); // Update the grid with the current player's mark
-        if (referee.isGameOver(board)) {
+            logger.info("make move happened " + mark);
+
             return true;
         }
-        switchPlayer();
         return false;
     }
-    return false;
-}
 
-    // Updates the grid after a move is made
-private void updateGrid(int row, int col) {
-    grid[row][col] = String.valueOf(currentPlayer.getMark());
-}
-
-// Resets the game to its initial state
-public void resetGame() {
-    this.grid = new String[3][3]; // Reinitialize the grid
-    this.board.initialize(); // Reset the board
-    this.currentPlayer = player1; // Reset the current player to player1
-}
-
-// Displays the current state of the grid
-public void displayGrid() {
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            if (grid[i][j] == null) {
-                System.out.print("- ");
-            } else {
-                System.out.print(grid[i][j] + " ");
+    public boolean isBoardFull() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (board[i][j] == '-') {
+                    return false;
+                }
             }
         }
-        System.out.println();
+        return true;
     }
-}
 
-    private void switchPlayer() {
-        currentPlayer = (currentPlayer == player1) ? player2 : player1;
+    public Player getCurrentPlayer() {
+        return players.values().toArray(new Player[0])[currentPlayerIndex];
+    }
+
+    public void addPlayer(String playerId, String playerName, char mark) {
+        Player player = new Player();
+        player.setName(playerName);
+        player.setMark(mark);
+        players.put(playerId, player);
+    }
+
+    public Player getWinner() {
+        for (Player player : players.values()) {
+            if (referee.hasWinner(board, player.getMark())) {
+                return player;
+            }
+        }
+        return null;
     }
 
     public boolean isGameOver() {
-        return referee.isGameOver(board);
-    }
+        if (players.size() < 2) {
+            return false;
+        }
 
+        Player[] playersArray = players.values().toArray(new Player[0]);
+        return referee.isGameOver(this, playersArray[0], playersArray[1]);
+    }
     
 
-    public Player getWinner() {
-        if (referee.hasWinner(board)) {
-            return currentPlayer;
+    public void resetGame() {
+        // Reset the board
+        board = new char[3][3];
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                board[i][j] = '-';
+            }
         }
-        return null;
+        // Clear players
+        players.clear();
+        // Reset current player index
+        currentPlayerIndex = 0;
+    }
+    
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                sb.append(board[i][j]);
+                if (j < 2) sb.append("|");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+    public int getNumberOfPlayers() {
+        return players.size();
+    }
+    
+	public Map<String, Player> getPlayers() {
+		return players;
+	}
+
+	public char getPlayerMark(String sessionId) {
+        Player player = players.get(sessionId);
+        if (player != null) {
+            return player.getMark();
+        }
+        return '-';
     }
 }

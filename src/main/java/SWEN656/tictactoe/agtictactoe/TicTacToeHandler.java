@@ -1,68 +1,104 @@
 package SWEN656.tictactoe.agtictactoe;
 
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.HashMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.socket.*;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
+
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
+@Component
 public class TicTacToeHandler extends TextWebSocketHandler {
 
-    private final Map<String, WebSocketSession> sessions = new HashMap<>();
     private final GameSessionManager gameSessionManager;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
+    @Autowired
     public TicTacToeHandler(GameSessionManager gameSessionManager) {
         this.gameSessionManager = gameSessionManager;
     }
 
     @Override
-    public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        Map<String, String> payload = objectMapper.readValue(message.getPayload(), Map.class);
-        String type = payload.get("type");
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        JsonNode jsonNode = new ObjectMapper().readTree(message.getPayload());
+        String type = jsonNode.get("type").asText();
 
         if ("join".equals(type)) {
-            String gameId = payload.get("gameId");
-            sessions.put(gameId, session);
-            broadcastGameState(gameId);
+            handleJoinMessage(session, jsonNode);
         } else if ("move".equals(type)) {
-            String gameId = payload.get("gameId");
-            String playerMark = payload.get("playerMark");
-            int row = Integer.parseInt(payload.get("row"));
-            int col = Integer.parseInt(payload.get("col"));
-
-            TicTacToeGame game = gameSessionManager.getGame(gameId);
-            if (game != null) {
-                game.makeMove(row, col);
-                broadcastGameState(gameId);
-            }
+            handleMoveMessage(session, jsonNode);
         }
     }
-
-    private void broadcastGameState(String gameId) throws Exception {
+    private void handleJoinMessage(WebSocketSession session, JsonNode jsonNode) throws IOException {
+        String gameId = jsonNode.get("gameId").asText();
+        boolean isJoined = gameSessionManager.joinGame(gameId, session); 
+        if (!isJoined) {
+            
+            String errorMessage = "{\"type\":\"join\",\"status\":\"error\",\"message\":\"Failed to join the game.\"}";
+            session.sendMessage(new TextMessage(errorMessage));
+            return;
+        }
+    
         TicTacToeGame game = gameSessionManager.getGame(gameId);
-        if (game != null) {
-            Map<String, Object> gameState = new HashMap<>();
-            gameState.put("type", "update");
-            gameState.put("board", game.getBoard().getGrid());
-            gameState.put("gameOver", game.isGameOver());
-            Player winner = game.getWinner();
+        if (game == null) {
+            String errorMessage = "{\"type\":\"join\",\"status\":\"error\",\"message\":\"Game not found.\"}";
+            session.sendMessage(new TextMessage(errorMessage));
+            return;
+        }
+    
+        char playerMark = game.getPlayerMark(session.getId());
+        
+//        Player currentPlayer = game.getCurrentPlayer();
+//        char playerMark = currentPlayer.getMark();
+    
+        // Send initial board state to the joining player
+        ObjectMapper mapper = new ObjectMapper();
+        String initialBoardMessage = mapper.writeValueAsString(Map.of("type", "join", "playerMark", playerMark, "status", "success", "board", game.getBoard()));
+        session.sendMessage(new TextMessage(initialBoardMessage));
+    }
+    
+
+    private void handleMoveMessage(WebSocketSession session, JsonNode jsonNode) throws IOException {
+        String gameId = jsonNode.get("gameId").asText();
+        char playerMark = jsonNode.get("playerMark").asText().charAt(0);
+        int row = jsonNode.get("row").asInt();
+        int col = jsonNode.get("col").asInt();
+
+        TicTacToeGame game = gameSessionManager.getGame(gameId);
+        if (game == null) {
+            return;
+        }
+
+        boolean validMove = game.makeMove(row, col, playerMark);
+        if (validMove) {
+            ObjectMapper mapper = new ObjectMapper();
+            String boardUpdateMessage = mapper.writeValueAsString(Map.of("type", "update", "board", game.getBoard()));
+            List<WebSocketSession> gameSessions = gameSessionManager.getSessions(gameId);
+            for (WebSocketSession s : gameSessions) {
+                s.sendMessage(new TextMessage(boardUpdateMessage));
+            }
+
+            Player winner = game.getWinner(); // Get winner from game
             if (winner != null) {
-                gameState.put("winner", winner.getMark());
-            } else {
-                gameState.put("winner", null);
+                String gameOverMessage = mapper.writeValueAsString(Map.of("type", "gameOver", "winner", winner.getMark()));
+                for (WebSocketSession s : gameSessions) {
+                    s.sendMessage(new TextMessage(gameOverMessage));
+                }
+            } else if (game.isBoardFull()) {
+                String gameOverMessage = mapper.writeValueAsString(Map.of("type", "gameOver"));
+                for (WebSocketSession s : gameSessions) {
+                    s.sendMessage(new TextMessage(gameOverMessage));
+                }
+                
+                // Reset game after notifying clients
+                game.resetGame();
             }
-
-            String gameStateJson = objectMapper.writeValueAsString(gameState);
-            TextMessage gameStateMessage = new TextMessage(gameStateJson);
-
-            WebSocketSession session = sessions.get(gameId);
-            if (session != null && session.isOpen()) {
-                session.sendMessage(gameStateMessage);
-            }
+        } else {
+            session.sendMessage(new TextMessage("{\"type\":\"error\",\"error\":\"Invalid move\"}"));
         }
     }
 }
