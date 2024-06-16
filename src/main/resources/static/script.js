@@ -48,7 +48,7 @@ function connectWebSocket() {
             console.log(`Player mark set to ${currentPlayer}`);
             
             // Display player's mark on UI
-            document.getElementById('playerMark').textContent = `Your mark: ${currentPlayer}`;
+            document.getElementById('playerMark').textContent = `Your identifier is : ${currentPlayer}`;
             
             const board = message.board; // Assuming backend sends the initial board state
             updateBoard(board); // Update board with the current state
