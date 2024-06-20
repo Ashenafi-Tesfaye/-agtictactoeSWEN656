@@ -7,8 +7,11 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Configuration;
+
 
 @Aspect
+@Configuration
 public class LoggingAspect {
     private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
 
@@ -18,13 +21,8 @@ public class LoggingAspect {
         logger.info("Player {} made a move at position {}", args[0], args[1]);
     }
 
-    @AfterReturning(pointcut = "execution(* SWEN656.tictactoe.agtictactoe.TicTacToeHandler.handleStartGame(..))", returning = "result")
-    public void logGameStart(JoinPoint joinPoint, Object result) {
-        logger.info("Game started: {}", result);
-    }
-
-    @After("execution(* SWEN656.tictactoe.agtictactoe.TicTacToeGame.checkWinner(..))")
-    public void logGameEnd(JoinPoint joinPoint) {
-        logger.info("Game ended. Checking winner...");
-    }
+   @After("execution(* SWEN656.tictactoe.agtictactoe.GameSessionManager.createGame(..))")
+   public void logGameStart(JoinPoint joinPoint) {
+       logger.info("Game started: {}");
+   }
 }

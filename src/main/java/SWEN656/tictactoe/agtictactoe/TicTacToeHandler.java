@@ -51,9 +51,7 @@ public class TicTacToeHandler extends TextWebSocketHandler {
         }
     
         char playerMark = game.getPlayerMark(session.getId());
-        
-//        Player currentPlayer = game.getCurrentPlayer();
-//        char playerMark = currentPlayer.getMark();
+       
     
         // Send initial board state to the joining player
         ObjectMapper mapper = new ObjectMapper();
@@ -82,7 +80,7 @@ public class TicTacToeHandler extends TextWebSocketHandler {
                 s.sendMessage(new TextMessage(boardUpdateMessage));
             }
 
-            Player winner = game.getWinner(); // Get winner from game
+            Player winner = game.getWinner();
             if (winner != null) {
                 String gameOverMessage = mapper.writeValueAsString(Map.of("type", "gameOver", "winner", winner.getMark()));
                 for (WebSocketSession s : gameSessions) {

@@ -46,9 +46,6 @@ public class TicTacToeGame {
         if (row >= 0 && row < 3 && col >= 0 && col < 3 && board[row][col] == '-') {
             board[row][col] = mark;
             currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
-
-            logger.info("Player {} made a move at [{}, {}]", mark, row, col); 
-
             return true;
         }
         return false;
